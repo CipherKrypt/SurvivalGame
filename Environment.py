@@ -1,3 +1,4 @@
+from Errors import *
 class Location:
     def __init__(self,place:str,thirst_mult:int,o2:int,merchant:int,people:int,trees:int,berries:int, river:int, stream:int, sea:int,hen:int,pig:int,gold:int,wolf:int):
         self.place=place
@@ -46,4 +47,99 @@ class Location:
 
         return search_result
 
+    def decrease_attribute(self,att:str):
+        if att=='th':
+            if self.decrease(self.thirst_mult):
+                self.thirst_mult-=0.5
+        elif att=='o':
+            if self.decrease(self.o2):
+                self.o2-=0.5
+        elif att=='m':
+            if self.decrease(self.merchant):
+                self.merchant-=5
+        elif att=='pe':
+            if self.decrease(self.people):
+                self.people-=5
+        elif att=='t':
+            if self.decrease(self.trees):
+                self.trees-=5
+        elif att=='b':
+            if self.decrease(self.berries):
+                self.berries-=5
+        elif att=='r':
+            if self.decrease(self.river):
+                self.river-=5
+        elif att=='st':
+            if self.decrease(self.stream):
+                self.stream-=5
+        elif att=='s':
+            if self.decrease(self.sea):
+                self.sea-=5
+        elif att=='h':
+            if self.decrease(self.hen):
+                self.hen-=5
+        elif att=='p':
+            if self.decrease(self.pig):
+                self.pig-=5
+        elif att=='g':
+            if self.decrease(self.gold):
+                self.gold-=5
+        elif att=='w':
+            if self.decrease(self.wolf):
+                self.wolf-=5
+        elif att=='all':
+            for attribute in ['th','o','m','pe','t','b','r','st','s','h','p','g','w']:
+                self.decrease_attribute(attribute)
+        else:
+            raise NotAnAttribute
 
+    def decrease(self,attribute:int):
+        if attribute!=0:
+            return True
+    def increase_attribute(self,att:str):
+        if att=='th':
+            self.thirst_mult +=0.5
+        elif att=='o':
+            self.o2 +=0.5
+        elif att=='m':
+            if self.increase(self.merchant):
+                self.merchant +=5
+        elif att=='pe':
+            if self.increase(self.people):
+                self.people +=5
+        elif att=='t':
+            if self.increase(self.trees):
+                self.trees +=5
+        elif att=='b':
+            if self.increase(self.berries):
+                self.berries +=5
+        elif att=='r':
+            if self.increase(self.river):
+                self.river +=5
+        elif att=='st':
+            if self.increase(self.stream):
+                self.stream +=5
+        elif att=='s':
+            if self.increase(self.sea):
+                self.sea +=5
+        elif att=='h':
+            if self.increase(self.hen):
+                self.hen +=5
+        elif att=='p':
+            if self.increase(self.pig):
+                self.pig +=5
+        elif att=='g':
+            if self.increase(self.gold):
+                self.gold +=5
+        elif att=='w':
+            if self.increase(self.wolf):
+                self.wolf +=5
+        elif att=='all':
+            for attribute in ['th','o','m','pe','t','b','r','st','s','h','p','g','w']:
+                self.increase_attribute(attribute)
+        else:
+            raise NotAnAttribute
+
+    def increase(self,attribute:int):
+        if attribute!=100:
+            return True
