@@ -1,3 +1,4 @@
+from Errors import *
 class function():
     def __init__(self,name:str,function_code:int,var:int):
         self.name=name
@@ -24,13 +25,34 @@ class moves:
         return f'a move set with\n' \
                f'{Moves}'
 
+    def __getitem__(self, index):
+        if type(index) == int:
+            c=0
+            for m in self.Moves:
+                if index == c:
+                    return m
+                else:
+                    c+=1
+            else:
+                raise IndexError("Object Move out of Index")
+
+        if type(index) == str:
+            for m in self.Moves:
+                if index.lower() == m.name.lower():
+                    return m
+            else:
+                raise ValueError(f"{index} is not in move")
+
     def list_it(self)->list:
-        return self.Moves
+        L=[]
+        for m in self.Moves:
+            L.append(m.name.lower())
+        return L
 
     def print_it(self) ->str:
         det=''
         for m in self.list_it():
-            det+= m.name+', '
+            det+=m+', '
         det= det.rstrip(', ')
         return det
 
@@ -52,6 +74,39 @@ class item():
 
     def quantity(self):
         return f'{self.amnt}'
+
+    def set_amnt(self,amnt:int):
+        self.amnt=amnt
+
+    def add_item(self,amnt:int=None):
+        if amnt==None:
+            self.amnt+=1
+        else:
+            self.amnt+=amnt
+
+    def sub_item(self,amnt:int=None)->bool:
+        if amnt == None:
+            if self.check_amnt():
+                self.amnt-=1
+        else:
+            if self.check_amnt(amnt):
+                self.amnt-=amnt
+            else:
+                raise NotEnoughItems
+        return self.check_amnt()
+
+    def check_amnt(self,amnt:int=None)->bool:
+        if amnt == None:
+            if self.amnt>0:
+                return True
+            else:
+                return False
+        else:
+            if amnt>=self.amnt:
+                return True
+            else:
+                return False
+
 
 class drop():
     def __init__(self,*Items:item):
@@ -77,14 +132,11 @@ class inventory():
 
     def __str__(self):
         string=''
-        for i in self.inventory
+        for i in self.inventory:
             string+=i.name+' '
 
         return f'Inventory contains items:\n' \
                f'{string}'
-
-    def default_inventory(self):
-        equip=function('Equip',)
 
 
 
