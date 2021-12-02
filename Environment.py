@@ -32,9 +32,12 @@ class Location:
                f'a {self.gold}% chance of finding gold\n' \
                f'a {self.wolf}% chance of encountering a wolf'
 
+    """"Searchables returns the chance of finding each attribute as a list """
     def searchables(self)-> list:
         return [self.merchant,self.people,self.trees,self.berries,self.river,self.stream,self.sea,self.hen,self.pig,self.gold,self.wolf]
 
+    """Search returns if the player was able to find the certain attribute as boolean values a
+     and puts it in a List after which we can traverse the list and do the needful."""
     def search(self) ->list:
         from random import randint
         search_result=[]
@@ -47,6 +50,8 @@ class Location:
 
         return search_result
 
+    """Decreases the chance of finding a specific or all of the attributes by a fixed amnt 
+    on the bases of the given string."""
     def decrease_attribute(self,att:str):
         if att=='th':
             if self.decrease(self.thirst_mult):
@@ -91,11 +96,15 @@ class Location:
             for attribute in ['th','o','m','pe','t','b','r','st','s','h','p','g','w']:
                 self.decrease_attribute(attribute)
         else:
-            raise NotAnAttribute
+            raise NotAnAttribute #raise this error if the wrong attribute string was entered
 
+    """Check if the given attribute is 0 or not"""
     def decrease(self,attribute:int):
         if attribute!=0:
             return True
+
+    """Decreases the chance of finding a specific or all of the attributes by a fixed amnt 
+        on the bases of the given string."""
     def increase_attribute(self,att:str):
         if att=='th':
             self.thirst_mult +=0.5
@@ -138,8 +147,9 @@ class Location:
             for attribute in ['th','o','m','pe','t','b','r','st','s','h','p','g','w']:
                 self.increase_attribute(attribute)
         else:
-            raise NotAnAttribute
+            raise NotAnAttribute #raise this error if the wrong attribute string was entered
 
-    def increase(self,attribute:int):
+    """Checks if the chance of finding an attribute is 100% or not and returns boolean value"""
+    def increase(self,attribute:int)-> bool:
         if attribute!=100:
             return True

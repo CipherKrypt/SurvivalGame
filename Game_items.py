@@ -1,4 +1,3 @@
-from LifeForm import *
 class function():
     def __init__(self,name:str,function_code:int,var:int):
         self.name=name
@@ -70,8 +69,22 @@ class drop():
     def content(self):
         content=''
 
+class inventory():
+    def __init__(self,*items:item):
+        self.inventory=[]
+        for i in items:
+            self.inventory.append(i)
 
+    def __str__(self):
+        string=''
+        for i in self.inventory
+            string+=i.name+' '
 
+        return f'Inventory contains items:\n' \
+               f'{string}'
+
+    def default_inventory(self):
+        equip=function('Equip',)
 
 
 

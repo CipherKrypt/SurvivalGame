@@ -13,6 +13,7 @@ print(food)
 Item=item('Pork',2,'Consumable that will replenish Energy',food)
 Drop=drop(Item)
 pig=Animal(100,'Pig','An animal with the chance to drop consumables',Drop)
-print(pig)
+player=Player(500,wild)
+print(player)
 
 
