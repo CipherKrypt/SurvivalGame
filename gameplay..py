@@ -1,5 +1,5 @@
 from LifeForm import *
-from Game_items import *
+from Errors import *
 
 player=Player(500)
 '''
@@ -17,21 +17,20 @@ player=Player(500,wild)
 print(player)
 #print(player)
 '''
+def get_ch(player:Player):
+    print(player.actions.print_it())
+    ch = input('Enter>> ')
+    ch = ch.lower().rstrip().lstrip()
+    if == 'help' or ch.lower() == '!h':
+        raise N
+    elif ch in player.actions.print_it():
+        pass
+    else:
 
 def game_loop():
     while True:
-        c=1
-        for m in player.actions.list_it():
-            print(str(c),'. ',str(m).capitalize(),end='  ')
-            c+=1
-        print()
         try:
-            ch=input('Enter>> ')
-            if ch.lower().rstrip().lstrip() == 'help' or ch.lower() == '!h':
-                pass
-            elif ch.lower().rstrip().lstrip() in player.actions.list_it():
-                pass
-            else:
+
                 print("Wrong Entry...Try Again. Enter 'help' or '!h' for help")
         except Exception as Err:
             print('Error')

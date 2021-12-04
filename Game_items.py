@@ -1,4 +1,5 @@
 from Errors import *
+
 class function():
     def __init__(self,name:str,function_code:int,var:int):
         self.name=name
@@ -8,12 +9,11 @@ class function():
     def __str__(self):
         return f'a function called {self.name} that will enact function code: {self.function_code} by {self.var} units'
 
-    '''def enact(self,person:Player):
-        if self.function_code==2:
-            pass'''
+    def set_var(self,amnt:int):
+        self.var=amnt
 
 class moves:
-    def __init__(self, *move: function):
+    def __init__(self, *move: function or None):
         self.Moves = []
         for m in move:
             self.Moves.append(m)
@@ -52,12 +52,12 @@ class moves:
     def print_it(self) ->str:
         det=''
         for m in self.list_it():
-            det+=m+', '
-        det= det.rstrip(', ')
+            det+=m+'   '
+        det= det.rstrip('   ')
         return det
 
 class item():
-    def __init__(self,name:str,amnt:int,desc:str,att:moves):
+    def __init__(self,name:str,amnt:int,desc:str,att:moves or None):
         self.name=name
         self.amnt=amnt
         self.desc=desc
@@ -70,7 +70,7 @@ class item():
                f'Available actions: {self.att.print_it()}\n'
 
     def description(self):
-        return f'{self.desc}'
+        print(f'{self.desc}')
 
     def quantity(self):
         return f'{self.amnt}'
@@ -107,6 +107,72 @@ class item():
             else:
                 return False
 
+class inventory():
+    def __init__(self,*items:item or None):
+            self.inventory=[]
+            for i in items:
+                self.inventory.append(i)
+
+    def __str__(self):
+        string=''
+        for i in self.inventory:
+            string+=str(i.name)+' '
+
+        return f'Inventory contains items:\n' \
+               f'{string}'
+
+    def __getitem__(self, index):
+        if type(index) == int:
+            c=0
+            for i in self.inventory:
+                if index == c:
+                    return i
+                else:
+                    c+=1
+            else:
+                raise IndexError("Object Inventory out of Index")
+        if type(index) == str:
+            for m in self.inventory:
+                if index.lower() == m.name.lower():
+                    return m
+            else:
+                raise ValueError(f"{index} is not in Inventory")
+
+    def list_inv(self)->list:
+        L=[]
+        for i in self.inventory:
+            L.append(i)
+        return L
+
+    def add_inv(self,items:item):
+        c=0
+        for i in self.list_inv():
+            if items.name.lower()==i:
+                amnt=items.amnt
+                self.inventory[c].add_item(amnt)
+                return
+            else:
+                c+=1
+        else:
+            self.inventory.append(items)
+            print(f'New Item {items.name} addded to inventory')
+            items.description()
+
+    def use_item(self,items:str)->bool:
+        try:
+            items:item=self.inventory[items.lower()]
+            items.sub_item()
+            if items.amnt == 0:
+                self.inventory.remove(items)
+            return True
+        except:
+            return False
+
+    def content(self):
+        content=[]
+        for item in self.inventory:
+            content.append(item.name.lower)
+        return content
 
 class drop():
     def __init__(self,*Items:item):
@@ -123,20 +189,18 @@ class drop():
 
     def content(self):
         content=''
+        for item in self.drop:
+            content+=item.name.capitalize()+' and '
+        content.rstrip(' and ')
+        return content
 
-class inventory():
-    def __init__(self,*items:item):
-        self.inventory=[]
-        for i in items:
-            self.inventory.append(i)
+    def collect(self,player_inv:inventory):
+        for item in self.drop:
+            player_inv.add_inv(item)
+            print()
+            print(f'You added {str(item.amnt)}x{item.name} into your inventory')
 
-    def __str__(self):
-        string=''
-        for i in self.inventory:
-            string+=i.name+' '
 
-        return f'Inventory contains items:\n' \
-               f'{string}'
 
 
 

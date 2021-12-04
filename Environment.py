@@ -1,6 +1,6 @@
 from Errors import *
 class Location:
-    def __init__(self,place:str,thirst_mult:int,o2:int,merchant:int,people:int,trees:int,berries:int, river:int, stream:int, sea:int,hen:int,pig:int,gold:int,wolf:int):
+    def __init__(self,place:str,thirst_mult:float,o2:int,merchant:int,people:int,trees:int,berries:int,water_source:int,hen:int,pig:int,gold:int,wolf:int):
         self.place=place
         self.thirst_mult=thirst_mult
         self.o2=o2
@@ -8,9 +8,7 @@ class Location:
         self.people=people
         self.trees=trees
         self.berries=berries
-        self.river=river
-        self.stream=stream
-        self.sea=sea
+        self.water_source=water_source
         self.hen=hen
         self.pig=pig
         self.gold=gold
@@ -24,13 +22,12 @@ class Location:
                f'a {self.people}% chance of meeting a person\n' \
                f'a {self.trees}% chance of finding a tree\n' \
                f'a {self.berries}% chance of finding healing berries\n' \
-               f'a {self.river}% chance of finding a river\n' \
-               f'a {self.stream}% chance of finding a stream\n' \
-               f'a {self.sea}% chance of finding a sea\n' \
+               f'a {self.water_source}% chance of finding a water source\n' \
                f'a {self.hen}% chance of finding a hen\n' \
                f'a {self.pig}% chance of finding a pig\n' \
                f'a {self.gold}% chance of finding gold\n' \
                f'a {self.wolf}% chance of encountering a wolf'
+
 
     """"Searchables returns the chance of finding each attribute as a list """
     def searchables(self)-> list:
@@ -52,7 +49,7 @@ class Location:
 
     """Decreases the chance of finding a specific or all of the attributes by a fixed amnt 
     on the bases of the given string."""
-    def decrease_attribute(self,att:str):
+    def decrease_attribute(self,att:str,amnt=5):
         if att=='th':
             if self.decrease(self.thirst_mult):
                 self.thirst_mult-=0.5
@@ -61,39 +58,33 @@ class Location:
                 self.o2-=0.5
         elif att=='m':
             if self.decrease(self.merchant):
-                self.merchant-=5
+                self.merchant-=amnt
         elif att=='pe':
             if self.decrease(self.people):
-                self.people-=5
+                self.people-=amnt
         elif att=='t':
             if self.decrease(self.trees):
-                self.trees-=5
+                self.trees-=amnt
         elif att=='b':
             if self.decrease(self.berries):
-                self.berries-=5
-        elif att=='r':
-            if self.decrease(self.river):
-                self.river-=5
-        elif att=='st':
-            if self.decrease(self.stream):
-                self.stream-=5
-        elif att=='s':
-            if self.decrease(self.sea):
-                self.sea-=5
+                self.berries-=amnt
+        elif att=='wa':
+            if self.decrease(self.water_source):
+                self.water_source-=amnt
         elif att=='h':
             if self.decrease(self.hen):
-                self.hen-=5
+                self.hen-=amnt
         elif att=='p':
             if self.decrease(self.pig):
-                self.pig-=5
+                self.pig-=amnt
         elif att=='g':
             if self.decrease(self.gold):
-                self.gold-=5
+                self.gold-=amnt
         elif att=='w':
             if self.decrease(self.wolf):
-                self.wolf-=5
+                self.wolf-=amnt
         elif att=='all':
-            for attribute in ['th','o','m','pe','t','b','r','st','s','h','p','g','w']:
+            for attribute in ['th','o','m','pe','t','b','wa','h','p','g','w']:
                 self.decrease_attribute(attribute)
         else:
             raise NotAnAttribute #raise this error if the wrong attribute string was entered
@@ -105,46 +96,40 @@ class Location:
 
     """Decreases the chance of finding a specific or all of the attributes by a fixed amnt 
         on the bases of the given string."""
-    def increase_attribute(self,att:str):
+    def increase_attribute(self,att:str,amnt=5):
         if att=='th':
             self.thirst_mult +=0.5
         elif att=='o':
             self.o2 +=0.5
         elif att=='m':
             if self.increase(self.merchant):
-                self.merchant +=5
+                self.merchant +=amnt
         elif att=='pe':
             if self.increase(self.people):
-                self.people +=5
+                self.people +=amnt
         elif att=='t':
             if self.increase(self.trees):
-                self.trees +=5
+                self.trees +=amnt
         elif att=='b':
             if self.increase(self.berries):
-                self.berries +=5
-        elif att=='r':
-            if self.increase(self.river):
-                self.river +=5
-        elif att=='st':
-            if self.increase(self.stream):
-                self.stream +=5
-        elif att=='s':
-            if self.increase(self.sea):
-                self.sea +=5
+                self.berries +=amnt
+        elif att=='wa':
+            if self.increase(self.water_source):
+                self.water_source +=amnt
         elif att=='h':
             if self.increase(self.hen):
-                self.hen +=5
+                self.hen +=amnt
         elif att=='p':
             if self.increase(self.pig):
-                self.pig +=5
+                self.pig +=amnt
         elif att=='g':
             if self.increase(self.gold):
-                self.gold +=5
+                self.gold +=amnt
         elif att=='w':
             if self.increase(self.wolf):
-                self.wolf +=5
+                self.wolf +=amnt
         elif att=='all':
-            for attribute in ['th','o','m','pe','t','b','r','st','s','h','p','g','w']:
+            for attribute in ['th','o','m','pe','t','b','wa','h','p','g','w']:
                 self.increase_attribute(attribute)
         else:
             raise NotAnAttribute #raise this error if the wrong attribute string was entered

@@ -168,15 +168,15 @@ class Player(Life):
 
     def premade_function(self,function_name:str)-> function:
         if function_name == 'drink':
-            fun= function('Drink',1,5)
+            fun = function('Drink',1,5)
         elif function_name == 'eat':
-            fun= function('Eat',2,5)
+            fun = function('Eat',2,5)
         elif function_name == 'equip':
-            fun= function('Equip',3,0)
+            fun = function('Equip',3,0)
         elif function_name == 'scout':
             fun = function('Scout',4,0)
         elif function_name == 'inventory':
-            fun == function('Check Inventory',5,0)
+            fun = function('Check Inventory',5,0)
         elif function_name == 'scratch':
             fun = function('Scratched',0,20)
         elif function_name == 'bite':
@@ -492,6 +492,7 @@ class Player(Life):
                             print('Wrong Entry! Try Again')
             return
         elif func.function_code == 5:# Check Inventory
+            pass
 
 
 
@@ -516,7 +517,7 @@ class Player(Life):
                     raise WrongEntry
 
             except Exception as Err:
-                if Err == WrongEntry
+                if Err == WrongEntry:
                     print('Wrong Entry! Try again!')
                 elif Err == NeedHelp:
                     self.help()
