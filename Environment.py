@@ -31,7 +31,7 @@ class Location:
 
     """"Searchables returns the chance of finding each attribute as a list """
     def searchables(self)-> list:
-        return [self.merchant,self.people,self.trees,self.berries,self.river,self.stream,self.sea,self.hen,self.pig,self.gold,self.wolf]
+        return [self.merchant,self.people,self.trees,self.berries,self.water_source,self.hen,self.pig,self.gold,self.wolf]
 
     """Search returns if the player was able to find the certain attribute as boolean values a
      and puts it in a List after which we can traverse the list and do the needful."""

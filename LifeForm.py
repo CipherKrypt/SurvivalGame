@@ -95,8 +95,9 @@ class Player(Life):
         self.location:Location=self.premade_location('wild')
         self.turn = 0
         self.equip:item or None = None
-        self.hydration = (self.hp)%10
-        self.energy = (self.hp)%10
+        self.hydration = (self.hp)/10
+        self.energy = (self.hp)/10
+        self.subject:Animal or item or Tree or None = None
         self.actions=moves(self.premade_function('scout'),self.premade_function('inventory'))
 
     def __str__(self):
@@ -132,6 +133,20 @@ class Player(Life):
             raise DeathByStarvation
         if self.hp <=100:
             print(f'(!)Your Hp is at a Critical Level. Only {str(self.hp)} HP left. Be careful! Try to Heal!')
+
+    def get_ch(self):
+        print('Do you want to...')
+        print(self.actions.print_it())
+        print(self.__str__())
+        ch = input('Enter>> ')
+        ch = ch.lower().rstrip().lstrip()
+        if ch == 'help' or ch.lower() == '!h':
+            raise NeedHelp
+        elif ch in self.actions.list_it():
+            func = self.actions[ch]
+            self.enact(func)
+        else:
+            raise WrongEntry
 
     def game_over(self,Err:Exception=None):
         if Err == DeathByDamage:
@@ -177,21 +192,33 @@ class Player(Life):
             fun = function('Scout',4,0)
         elif function_name == 'inventory':
             fun = function('Check Inventory',5,0)
+        elif function_name == 'hunt':
+            fun = function('Hunt',6,0)
+        elif function_name == 'refill':
+            fun = function('Refill',7,0)
+        elif function_name == 'pass':
+            fun = function('Pass',8,0)
+        elif function_name == 'collect':
+            fun = function('Collect',9,0)
+        elif function_name == 'chop':
+            fun = function('Chop',10,0)
         elif function_name == 'scratch':
             fun = function('Scratched',0,20)
         elif function_name == 'bite':
             fun = function('Bit',0,30)
         elif function_name == 'heal':
-            fun = function('Eat',6,20)
+            fun = function('Eat',11,20)
         elif function_name == 'evade':
             escape=52-2*self.xp.lvl
             if escape <0:
                 escape=0
-            fun = function('Evaded',8,escape)
-        elif function_name == 'attack':
-            fun = function('Attack',0,20)
-        elif function_name == 'chop':
-            fun = function('Chop',0,1)
+            fun = function('Evaded',12,escape)
+        elif function_name == 'return':
+            fun = function('Return',13,0)
+        elif function_name == 'damage':
+            fun = function('Damage',0,20)
+        elif function_name == 'chopper':
+            fun = function('Chopper',0,1)
         elif function_name == 'light':
             fun = function('Light',0,20)
         elif function_name == 'fire':
@@ -210,15 +237,13 @@ class Player(Life):
         elif item_name == 'pork':
             Item = item('Meat', 2, 'Consumable dropped by Hen and Pig that will replenish Energy',moves(self.premade_function('eat')))
         elif item_name == 'axe':
-            Item = item('Axe',1,'An item that can be equipped to cut down trees',moves(self.premade_function('equip'),
-                                                                                       self.premade_function('chop'),
-                                                                                       self.premade_function('attack').set_var(10+10*self.xp.lvl)))
+            Item = item('Axe',1,'An item that can be equipped to cut down trees',moves(self.premade_function('equip'),self.premade_function('chopper'),self.premade_function('damage')))
         elif item_name == 'berry':
             Item = item('Berry',1,'A Consumable that will replenish HP',moves(self.premade_function('heal')))
         elif item_name == 'gold':
             Item = item('Gold',1,'Gold can be found or dropped by wolves. Use it to buy items from merchants',None)
         elif item_name == 'torch':
-            Item = item('Torch',1,'An item that consumes 1xwood per cycle to provide fire and ward off Wolves when equiped',moves(self.premade_function('fire')))
+            Item = item('Torch',1,'An item that consumes 1xwood per cycle to provide fire and ward off Wolves when equiped',moves(self.premade_function('equip'),self.premade_function('light'),self.premade_function('fire')))
         else:
             raise NotAnAttribute
         return Item
@@ -243,75 +268,93 @@ class Player(Life):
 
     def enact(self,func:function):
         if func.function_code == 1:# Drink
-            pass
+            self.hydration+=func.var
+            print('Ah! That was a refreshing drink')
         elif func.function_code == 2:# Eat
-            pass
+            self.energy+=func.var
+            print('Maaaaan! That was good!')
         elif func.function_code == 3:# Equip
-            pass
+            self.equip_item(self.subject)
+            print(f'You equipped {self.subject.name}')
         elif func.function_code == 4:
-            if 'Light' in self.equip.att.list_it():
-                if self.inventory.use_item('Wood'):
-                    self.location.decrease_attribute('w',self.equip.att[0].var)
+            if self.equip != None:
+                if 'Light' in self.equip.att.list_it():
+                    if self.inventory.use_item('Wood'):
+                        self.location.decrease_attribute('w',self.equip.att[0].var)
             scouted=self.location.search()
+            print('scouted')
+
             if scouted[8]:#Attack by Wolf
-                if self.equip.name != 'torch':
-                    wolf=self.premade_animal('wolf')
-                    try:
-                        print('\n'
-                              'Yikes! You encountered a wolf. You heard it gives some useful drops but maybe escaping is wiser')
-                        run=True
-                        while not wolf.is_dead():
-                            print('Do you want to...')
-                            print('Attack   Inventory   Nothing',end='')
-                            if run:
-                                print('Run')
-                            print(self.__str__())
-                            ch=input('Enter>> ')
-                            ch=ch.lower().lstrip().rstrip()
-                            if ch == 'help' or ch == '!h':
-                                raise NeedHelp
-                            elif ch == 'attack' or ch == 'nothing':
-                                if ch == 'attack' and 'attack' in self.equip.att.list_it():
-                                    print(f'You dealed {str(self.equip.att[1].var)} Damage.')
-                                    if wolf.hit(self.equip.att[1].var):
-                                        print(f'Phew! The wolf ran way....Woah it dropped {wolf.drops.content()}!')
-                                        self.collect(wolf.drops.collect(self.inventory))
-                                        self.xp.add_xp(wolf.max_hp%10)
-                                        break
-                                else:
-                                    print('You need to equip something that can deal damage\n')
-                                    continue
-                                from random import choice
-                                m:function=choice(list(wolf.move))
-                                print(f'The wolf {m.name} you and dealed {str(m.var)} damage!')
-                                if self.hit(m.var):
-                                    raise DeathByDamage
-                                else:
-                                    continue
-                            elif ch == 'run' and run:
-                                from random import randint
-                                if randint(1,100)<=(5+5*self.xp.lvl):
-                                    print('\n'
-                                          "Phew! It seemed the wolf wasn't interested in you. You escaped")
-                                    break
-                                else:
-                                    print('\n'
-                                          'Oh No! The wolf caught your scent! You have to fight')
-                                    run=False
-                                    continue
-                            elif ch == 'inventory':
-                                self.enact(self.actions[1])
-                            else:
-                                raise WrongEntry
-                    except Exception as Err:
-                        if Err == NeedHelp:
-                            self.help()
-                        elif Err == DeathByDamage:
-                            return Err
-                        elif Err == WrongEntry:
-                            print('Invalid Entry...Try again')
+                while True:
+                    if self.equip == None:
+                        break
+                    if 'damage' in self.equip.att.list_it():
+                        break
+                    else:
+                        return
+
+                wolf=self.premade_animal('wolf')
+                try:
+                    print('\n'
+                          'Yikes! You encountered a wolf. You heard it gives some useful drops but maybe escaping is wiser')
+                    run=True
+                    while not wolf.is_dead():
+                        print('Do you want to...')
+                        print('attack   inventory   nothing   ',end='')
+                        if run:
+                            print('run')
                         else:
-                            pass
+                            print()
+                        print(self.__str__())
+                        ch=input('Enter>> ')
+                        ch=ch.lower().lstrip().rstrip()
+                        if ch == 'help' or ch == '!h':
+                            raise NeedHelp
+                        elif ch == 'attack' or ch == 'nothing':
+                            if self.equip == None:
+                                print('You need to equip something that can deal damage\n')
+                                continue
+                            elif ch == 'attack' and 'damage' in self.equip.att.list_it():
+                                print(f'You dealed {str(self.equip.att[1].var)} Damage.')
+                                if wolf.hit(self.equip.att[1].var):
+                                    print(f'Phew! The wolf ran way....Woah it dropped {wolf.drops.content()}!')
+                                    self.collect(wolf.drops.collect(self.inventory))
+                                    self.xp.add_xp(wolf.max_hp%10)
+                                    break
+                            else:
+                                print('You need to equip something that can deal damage\n')
+                                continue
+                            from random import choice
+                            m:function=choice(list(wolf.move))
+                            print(f'The wolf {m.name} you and dealed {str(m.var)} damage!')
+                            if self.hit(m.var):
+                                raise DeathByDamage
+                            else:
+                                continue
+                        elif ch == 'run' and run:
+                            from random import randint
+                            if randint(1,100)<=(5+5*self.xp.lvl):
+                                print('\n'
+                                      "Phew! It seemed the wolf wasn't interested in you. You escaped")
+                                break
+                            else:
+                                print('\n'
+                                      'Oh No! The wolf caught your scent! You have to fight')
+                                run=False
+                                continue
+                        elif ch == 'inventory':
+                            self.enact(self.actions[1])
+                        else:
+                            raise WrongEntry
+                except Exception as Err:
+                    if Err == NeedHelp:
+                        self.help()
+                    elif Err == DeathByDamage:
+                        return Err
+                    elif Err == WrongEntry:
+                        print('Invalid Entry...Try again')
+                    else:
+                        pass
 
             if scouted[2]:#Found a Tree
                 from random import randint
@@ -319,31 +362,11 @@ class Player(Life):
                 wood=randint(1*lv,2+1*lv)
                 tree=Tree(wood)
                 print('You found a tree. Chop Chop')
+                self.subject = tree
                 try:
                     while not tree.is_cut:
-                        print('Do you want to....')
-                        print('Chop    Inventory   Pass')
-                        ch=input('Enter>> ')
-                        ch = ch.lower().lstrip().rstrip()
-                        if ch == 'help' or ch == '!h':
-                            raise NeedHelp
-                        if ch == 'chop':
-                            if 'chop' in self.equip.att.list_it():
-                                tree.is_cut=True
-                                wood=tree.wood*self.equip.att["chop"]
-                                print(f'Nice! You collected {str(wood)}xWood.\n')
-                                self.inventory.add_inv(self.premade_item('wood').set_amnt(wood))
-                            else:
-                                print('You need to equip something that can chop,to chop the tree\n')
-                                continue
-                        elif ch == 'inventory':
-                            self.enact(self.actions[1])
-                        elif ch == 'pass':
-                            print('Meh...Extra wood is just extra baggage...You can probably make do with what you got')
-                            break
-                        else:
-                            raise WrongEntry
-
+                        self.actions = moves(self.premade_function('chop'),self.premade_function('inventory'),self.premade_function('pass'))
+                        self.get_ch()
                 except Exception as Err:
                         if Err == NeedHelp:
                             self.help()
@@ -351,22 +374,12 @@ class Player(Life):
                             return Err
             if scouted[3]:#Found Berry
                 print("Hey Look! A berry! Should you take it... might be poisonous.")
+                self.subject = self.premade_item('berry')
                 while True:
                     try:
-                        print('Do you want to...\n'
-                              'Collect   Pass')
-                        ch = input('Enter>> ')
-                        ch = ch.lower().lstrip().rstrip()
-                        if ch == 'help' or ch == '!h':
-                            raise NeedHelp
-                        elif ch == 'collect':
-                            self.collect(self.premade_item('berry'))
-                            break
-                        elif ch == 'pass':
-                            print("You don't touch it. Could be deadly. You will never know.")
-                            break
-                        else:
-                            raise WrongEntry
+                        self.actions= moves(self.premade_function('collect'),self.premade_function('pass'))
+                        self.get_ch()
+                        break
                     except Exception as Err:
                         if Err == NeedHelp:
                             self.help()
@@ -378,22 +391,8 @@ class Player(Life):
                 print('You found a water source. Maybe you should refill your Canteen')
                 while True:
                     try:
-                        print('Do you want to...\n'
-                              'Refill   Pass')
-                        print(self.__str__())
-                        ch=input('Enter>> ')
-                        ch=ch.lower().rstrip().lstrip()
-                        if ch == 'help' or ch == '!h':
-                            raise NeedHelp
-                        elif ch == 'refill':
-                            self.hydration=self.hp%10
-                            self.inventory.add_inv(self.premade_function('water').set_var(5))
-                            break
-                        elif ch == 'pass':
-                            print('Na..Too lazy, besides your not thirsty... Yet.')
-                            break
-                        else:
-                            raise WrongEntry
+                        self.actions = moves(self.premade_function('refill'),self.premade_function('pass'))
+                        break
                     except Exception as Err:
                         if Err == NeedHelp:
                             self.help()
@@ -403,31 +402,13 @@ class Player(Life):
                             pass
 
             if scouted[5]:#Found a hen
-                hen=self.premade_animal('hen')
+                self.subject=self.premade_animal('hen')
                 print('You came across a hen. Chicken for dinner sounds good ...Yum!')
                 while True:
                     try:
-                        print('Do you want to...\n'
-                              'Hunt   Inventory   Pass')
-                        print(self.__str__())
-                        ch=input('Enter>> ')
-                        ch=ch.lower().lstrip().rstrip()
-                        if ch == 'help' or ch == '!h':
-                            raise NeedHelp
-                        elif ch == 'hunt':
-                            if not self.enact(hen.move[0]):
-                                print(f'Here...buck.buck.buck.. -catches hen- Nice! got {hen.drops.content()}!')
-                                self.collect(hen.drops.collect(self.inventory))
-                            else:
-                                print("Sheesh! It got away... Maybe next time.")
+                        self.actions=moves(self.premade_function('hunt'),self.premade_function('inventory'),self.premade_function('pass'))
+                        if self.get_ch():
                             break
-                        elif ch == 'inventory':
-                            self.enact(self.premade_function('inventory'))
-                        elif ch == 'pass':
-                            print("That hen seems to be in a 'fowl' mood -pun- it might peck. Surely the next one.")
-                            break
-                        else:
-                            raise WrongEntry
                     except Exception as Err:
                         if Err == NeedHelp:
                             self.help()
@@ -436,31 +417,13 @@ class Player(Life):
                         else:
                             pass
             if scouted[6]:  # Found a pig
-                pig = self.premade_animal('pig')
+                self.subject = self.premade_animal('pig')
                 print('You came across a pig. Hmmm....you can already smell the bacon...Yum!')
                 while True:
                     try:
-                        print('Do you want to...\n'
-                              'Hunt   Inventory   Pass')
-                        print(self.__str__())
-                        ch = input('Enter>> ')
-                        ch = ch.lower().lstrip().rstrip()
-                        if ch == 'help' or ch == '!h':
-                            raise NeedHelp
-                        elif ch == 'hunt':
-                            if not self.enact(pig.move[0]):
-                                print(f'If you move reeeaaalll slow, you might become invisible -catches pig- Cool! got {pig.drops.content()}!')
-                                self.collect(pig.drops.collect(self.inventory))
-                            else:
-                                print("Man! That pig was FAST!... So much for your bacon -eyeroll-.")
-                            break
-                        elif ch == 'inventory':
-                            self.enact(self.premade_function('inventory'))
-                        elif ch == 'pass':
-                            print("Oh you just realised....you don't know how to cook bacon. -shrug-")
-                            pass
-                        else:
-                            raise WrongEntry
+                        self.actions = moves(self.premade_function('hunt'), self.premade_function('inventory'),self.premade_function('pass'))
+                        self.get_ch()
+                        break
                     except Exception as Err:
                         if Err == NeedHelp:
                             self.help()
@@ -471,20 +434,11 @@ class Player(Life):
 
             if scouted[7]: #found Gold
                 print("Huh? What is that shining? Oh, looks like Gold!")
+                self.subject = self.premade_item('gold')
                 while True:
                     try:
-                        print('Do you want to...\n'
-                              'Collect   Pass')
-                        ch=input('Enter>> ')
-                        ch=ch.lower().lstrip().rstrip()
-                        if ch == 'help' or ch=='!h':
-                            raise NeedHelp
-                        elif ch == 'collect':
-                            self.collect(self.premade_item('gold'))
-                            break
-                        elif ch == 'pass':
-                            print("Nah....looks like Fool's Gold...you walk away from the gold. A Fool!")
-                            break
+                        self.actions = moves(self.premade_function('collect'),self.premade_function('pass'))
+                        self.get_ch()
                     except Exception as Err:
                         if Err == NeedHelp:
                             self.help()
@@ -492,35 +446,122 @@ class Player(Life):
                             print('Wrong Entry! Try Again')
             return
         elif func.function_code == 5:# Check Inventory
-            pass
+            print("\n"
+                  "Your Inventory\n"
+                  "---------------")
+            if self.inventory == None:
+                print('-Nothing in Inventory-')
+                return
+            inv=self.inventory.list_inv()
+            for i in range(len(inv)):
+                print(f'{str(i+1)}. {inv[i].name}')
+            try:
+                ch = int(input('Enter item number>> '))
+                if ch <= len(inv)+1:
+                    print('y')
+                    items:item=self.inventory[ch-1]
+                    self.subject = items
+                    print(items)
+                    self.actions = moves(items.att[0], self.premade_function('return'))
+                    self.get_ch()
+            except Exception as Err:
+                if Err == NeedHelp:
+                    self.help()
+                elif Err == WrongEntry:
+                    print('Wrong Entry! Try Again!')
+                else:
+                    pass
+        elif func.function_code == 6: # Hunt the Animal
+            print('Hunt')
+            animal = self.subject
+            if animal.animal == 'Hen':
+                    if not self.enact(animal.move[0]):
+                        print(f'Here...buck.buck.buck.. -catches hen- Nice! got {animal.drops.content()}!')
+                        self.collect(animal.drops.collect(self.inventory))
+                        return True
+                    else:
+                        print("Sheesh! It got away... Maybe next time.")
+                        return True
+            if animal.animal == 'Pig':
+                if not self.enact(animal.move[0]):
+                    print(f'If you move reeeaaalll slow, you might become invisible -catches pig- Cool! got {animal.drops.content()}!')
+                    self.collect(animal.drops.collect(self.inventory))
+                    return True
+                else:
+                    print("Man! That pig was FAST!... So much for your bacon -eyeroll-.")
+                    return True
 
+        elif func.function_code == 7:# Refill
+            print('Refill')
+            self.hydration = self.hp / 10
+            self.inventory.add_inv(self.premade_function('water').set_var(5))
 
+        elif func.function_code == 8:# Pass
+            print('Pass')
+            if type(self.subject) == Animal:
+                animal = self.subject
+                if animal.animal == 'Hen':
+                    print("That hen seems to be in a 'fowl' mood -pun-. It might peck. You're not that 'peckish' -another pun-.")
+                if animal.animal == 'Pig':
+                    print("Oh you just realised....you don't know how to cook bacon. -shrug-")
+            if type(self.subject) == item:
+                items:item= self.subject
+                if items.name == 'Berry':
+                    print("You don't touch it. Could be deadly. You will never know.")
+                if items.name == 'Gold':
+                    print("Nah....looks like Fool's Gold...you walk away from the gold. A Fool!")
+            if type(self.subject) == Tree:
+                print('Meh...Extra wood is just extra baggage...You can probably make do with what you got')
+            if type(self.subject) == None:
+                print('Na..Too lazy, besides your not thirsty... Yet.')
 
+            print()
 
+        elif func.function_code == 9:# Collect
+            print('Collect')
+            items = self.subject
+            self.collect(items)
+
+        elif func.function_code == 10:# Chop
+            print('Chop')
+            tree= self.subject
+            try:
+                if self.equip == None:
+                    print('You need to equip something that has chopper attribute,to chop the tree\n')
+                    return
+                elif 'chopper' in self.equip.att.list_it():
+                    tree.is_cut = True
+                    wood = tree.wood * self.equip.att["chop"].var
+                    print(f'Nice! You collected {str(wood)}xWood.\n')
+                    self.inventory.add_inv(self.premade_item('wood').set_amnt(wood))
+                else:
+                    print('You need to equip something that has chopper attribute,to chop the tree\n')
+                    return
+            except Exception as e:
+                print(e)
+
+        elif func.function_code == 11:# Heal
+            print('Heal')
+            self.regenerate(50)
+            self.inventory.use_item(self.subject)
+
+        elif func.function_code == 12:# Evade
+            print('Evade')
+            from random import randint
+            if randint(0,100)<=func.var:
+                print('True')
+                return True
+            else:
+                print('False')
+                return False
+
+        elif func.function_code == 13:# Return
+            return
 
     def collect(self,items:item):
         print(f'You found a {str(items.amnt)}{items.name}: {items.desc}')
-        while True:
-            try:
-                print('Do you want to collect or pass?')
-                ch=input('Enter>> ')
-                ch = ch.lower().rstrip().lstrip()
-                if ch == 'help' or ch == '!h':
-                    raise NeedHelp
-                elif ch == 'collect':
-                    print(f'You collected {str(items.amnt)}x{items.name}')
-                    print()
-                    self.inventory.add_inv(items)
-                elif ch == 'pass':
-                    break
-                else:
-                    raise WrongEntry
+        print(f'You collected {str(items.amnt)}x{items.name}')
+        print()
+        self.inventory.add_inv(items)
 
-            except Exception as Err:
-                if Err == WrongEntry:
-                    print('Wrong Entry! Try again!')
-                elif Err == NeedHelp:
-                    self.help()
-                else:
-                    pass
 

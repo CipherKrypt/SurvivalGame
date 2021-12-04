@@ -43,31 +43,48 @@ class moves:
             else:
                 raise ValueError(f"{index} is not in move")
 
-    def list_it(self)->list:
+    def list_it(self,is_item=False)->list:
         L=[]
-        for m in self.Moves:
-            L.append(m.name.lower())
+        if is_item:
+            L.append(self.Moves[0].name)
+            L.append(function('Pass',8,0).name)
+        else:
+            for m in self.Moves:
+                L.append(m.name.lower())
         return L
 
-    def print_it(self) ->str:
+    def print_it(self,is_item=False) ->str:
         det=''
-        for m in self.list_it():
+        for m in self.list_it(is_item):
             det+=m+'   '
         det= det.rstrip('   ')
         return det
 
 class item():
-    def __init__(self,name:str,amnt:int,desc:str,att:moves or None):
+    def __init__(self,name:str,amnt:int,desc:str,att:moves or None) -> object:
         self.name=name
         self.amnt=amnt
         self.desc=desc
-        self.att=att
+        self.att:moves or None =att
 
     def __str__(self):
+        Att=''
+        if len(self.att.list_it())>1:
+            for i in range(1,len(self.att.list_it())):
+                Att+=self.att[i].name+' | '
+            Att.rstrip(' | ')
+        else:
+            Att='No Attributes'
+
+        if self.att != None:
+            att = self.att.print_it(True)
+        else:
+            att = 'Nothing'
         return f'Item Detail\n' \
                f'Name: {self.name}\n' \
                f'Description: {self.desc}\n' \
-               f'Available actions: {self.att.print_it()}\n'
+               f'Attribute: {Att}\n' \
+               f'Available actions: {att}\n'
 
     def description(self):
         print(f'{self.desc}')

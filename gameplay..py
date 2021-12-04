@@ -17,22 +17,24 @@ player=Player(500,wild)
 print(player)
 #print(player)
 '''
-def get_ch(player:Player):
-    print(player.actions.print_it())
-    ch = input('Enter>> ')
-    ch = ch.lower().rstrip().lstrip()
-    if == 'help' or ch.lower() == '!h':
-        raise N
-    elif ch in player.actions.print_it():
-        pass
-    else:
+def main_menu():
+    print('Main Menu')
 
 def game_loop():
     while True:
         try:
-
-                print("Wrong Entry...Try Again. Enter 'help' or '!h' for help")
+            player.actions = moves(player.premade_function('scout'),player.premade_function('inventory'))
+            player.get_ch()
+            player.cycle()
         except Exception as Err:
-            print('Error')
+            if Err == NeedHelp:
+                player.help()
+            elif Err == WrongEntry:
+                print('Invalid Entry...Try again')
+            elif Err == DeathByDamage or Err == DeathByDehydration or Err == DeathByStarvation:
+                player.game_over(Err)
+                main_menu()
+            else:
+                print(Err)
 
 game_loop()

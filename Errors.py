@@ -18,6 +18,3 @@ class DeathByDehydration(Exception):
 
 class DeathByStarvation(Exception):
     '''In the case the Player didn't have enough Energy'''
-
-class DeathByZeroHp(Exception):
-    '''In case the Player's Hp drops to Zero'''
