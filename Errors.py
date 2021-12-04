@@ -1,3 +1,9 @@
+class NeedHelp(Exception):
+    '''When the player needs help'''
+
+class WrongEntry(Exception):
+    '''In case player entered wrong command'''
+
 class NotAnAttribute(Exception):
     '''In case the attributes are wrong'''
 
@@ -5,4 +11,13 @@ class NotEnoughItems(Exception):
     '''In the case that Player doesn't have enough items for an action'''
 
 class DeathByDamage(Exception):
-    '''In the case that Player dies'''
+    '''In the case that Player dies due to damage'''
+
+class DeathByDehydration(Exception):
+    '''In the case the Player didn't have enough Hydration'''
+
+class DeathByStarvation(Exception):
+    '''In the case the Player didn't have enough Energy'''
+
+class DeathByZeroHp(Exception):
+    '''In case the Player's Hp drops to Zero'''
