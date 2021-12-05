@@ -20,8 +20,11 @@ class moves:
 
     def __str__(self):
         Moves = ''
-        for m in self.Moves:
-            Moves += f'with move {m.name} \n'
+        if self.Moves == None:
+            Moves+= f'with no moves'
+        else:
+            for m in self.Moves:
+                Moves += f'with move {m.name} \n'
         return f'a move set with\n' \
                f'{Moves}'
 
@@ -46,11 +49,17 @@ class moves:
     def list_it(self,is_item=False)->list:
         L=[]
         if is_item:
-            L.append(self.Moves[0].name)
-            L.append(function('Pass',8,0).name)
+            if self.Moves == None:
+                pass
+            else:
+                L.append(self.Moves[0].name)
+            L.append(function('return',8,0).name)
         else:
-            for m in self.Moves:
-                L.append(m.name.lower())
+            try:
+                for m in self.Moves:
+                    L.append(m.name.lower())
+            except:
+                L.append('None')
         return L
 
     def print_it(self,is_item=False) ->str:
@@ -61,19 +70,22 @@ class moves:
         return det
 
 class item():
-    def __init__(self,name:str,amnt:int,desc:str,att:moves or None) -> object:
+    def __init__(self,name:str,amnt:int,desc:str,att:moves or None):
         self.name=name
-        self.amnt=amnt
+        self.amnt: int =amnt
         self.desc=desc
         self.att:moves or None =att
 
     def __str__(self):
         Att=''
-        if len(self.att.list_it())>1:
-            for i in range(1,len(self.att.list_it())):
-                Att+=self.att[i].name+' | '
-            Att.rstrip(' | ')
-        else:
+        try:
+            if len(self.att.list_it())>1:
+                for i in range(1,len(self.att.list_it())):
+                    Att+=self.att[i].name+' | '
+                Att.rstrip(' | ')
+            else:
+                Att = 'No Attributes'
+        except:
             Att='No Attributes'
 
         if self.att != None:
@@ -82,6 +94,7 @@ class item():
             att = 'Nothing'
         return f'Item Detail\n' \
                f'Name: {self.name}\n' \
+               f'Amount: {str(self.amnt)}\n' \
                f'Description: {self.desc}\n' \
                f'Attribute: {Att}\n' \
                f'Available actions: {att}\n'
@@ -90,10 +103,10 @@ class item():
         print(f'{self.desc}')
 
     def quantity(self):
-        return f'{self.amnt}'
+        return f'{str(self.amnt)}'
 
-    def set_amnt(self,amnt:int):
-        self.amnt=amnt
+    def set_amnt(self,n:int):
+        self.amnt = n
 
     def add_item(self,amnt:int=None):
         if amnt==None:
@@ -164,7 +177,7 @@ class inventory():
     def add_inv(self,items:item):
         c=0
         for i in self.list_inv():
-            if items.name.lower()==i:
+            if i == items.name.lower():
                 amnt=items.amnt
                 self.inventory[c].add_item(amnt)
                 return
@@ -172,17 +185,21 @@ class inventory():
                 c+=1
         else:
             self.inventory.append(items)
-            print(f'New Item {items.name} addded to inventory')
-            items.description()
+            print(f'New Item {items.name} added to inventory\n'
+                  f'{items.desc}\n')
 
-    def use_item(self,items:str)->bool:
+    def use_item(self,itim:str)->bool:
         try:
-            items:item=self.inventory[items.lower()]
-            items.sub_item()
-            if items.amnt == 0:
-                self.inventory.remove(items)
-            return True
-        except:
+            for m in self.inventory:
+                if itim.lower() == m.name.lower():
+                    items=m
+                    if items.sub_item():
+                        if items.amnt == 0:
+                            self.inventory.remove(items)
+                return True
+            else:
+                return False
+        except Exception as E:
             return False
 
     def content(self):
@@ -208,7 +225,7 @@ class drop():
         content=''
         for item in self.drop:
             content+=item.name.capitalize()+' and '
-        content.rstrip(' and ')
+        content = content.rstrip(' and ')
         return content
 
     def collect(self,player_inv:inventory):

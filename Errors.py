@@ -18,3 +18,6 @@ class DeathByDehydration(Exception):
 
 class DeathByStarvation(Exception):
     '''In the case the Player didn't have enough Energy'''
+
+class Survived(Exception):
+    '''In the case that the player survived 30 days'''
