@@ -62,7 +62,7 @@ def game_loop():
             pass
     print(f'''
     You survived for {str(player.day)} Day with a Level of {str(player.xp.lvl)}
-                                -GAME OVER-
+                     -GAME OVER-
     ''')
     main_menu()
 

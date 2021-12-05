@@ -153,7 +153,7 @@ class Player(Life):
             return False
         elif ch in self.actions.list_it():
             func = self.actions[ch]
-            return(self.enact(func))
+            return self.enact(func)
         else:
             return WrongEntry
 
@@ -294,7 +294,7 @@ class Player(Life):
         return Item
 
     def premade_inventory(self)-> inventory:
-        invent = inventory(self.premade_item('water'), self.premade_item('axe'))
+        invent = inventory(self.premade_item('axe'))
         return invent
 
     def premade_animal(self,animal_name:str) -> Animal:
@@ -322,7 +322,7 @@ class Player(Life):
         if func.function_code == 1:#
             cond = self.inventory.use_item('water')
             if cond:
-                max_val=self.xp.lvl/10
+                max_val=self.max_hp/10
                 max_val = float(max_val)
                 if self.hydration == max_val:
                     print("You weren't thirsty, but who doesn't like a good drink")
@@ -338,9 +338,9 @@ class Player(Life):
                 print()
                 return False
         elif func.function_code == 2:# Eat
-            cond = self.inventory.use_item('water')
+            cond = self.inventory.use_item('meat')
             if cond:
-                max_val = self.xp.lvl / 10
+                max_val = self.max_hp / 10
                 max_val = float(max_val)
                 if self.inventory.use_item('meat'):
                     if self.energy == float(max_val):
@@ -359,7 +359,7 @@ class Player(Life):
         elif func.function_code == 3:# Equip
             self.equip_item(self.subject)
             print(f'You equipped {self.subject.name}\n')
-        elif func.function_code == 4:
+        elif func.function_code == 4:# Scout
             if self.equip != None:
                 if 'Light' in self.equip.att.list_it():
                     if self.inventory.use_item('Wood'):
@@ -384,7 +384,7 @@ class Player(Life):
                     run=True
                     while not wolf.is_dead():
                         print('Do you want to...')
-                        print('attack   inventory   nothing   ',end='')
+                        print('attack   check inventory   nothing   ',end='')
                         if run:
                             print('run')
                         else:
@@ -403,7 +403,7 @@ class Player(Life):
                                 elif ch == 'attack' and 'damage' in self.equip.att.list_it():
                                     print(f'You dealed {str(30*self.equip.att[1].var)} Damage.\n')
                                     if wolf.hit(30*self.equip.att[1].var):
-                                        print(f'Phew! The wolf ran way....Woah it dropped {wolf.drops.content()}!')
+                                        print(f'Phew! The wolf ran way....Woah it dropped {wolf.drops.content()} !')
                                         self.collect(wolf.drops.collect(self.inventory))
                                         self.xp.add_xp(wolf.max_hp%10)
                                         break
@@ -429,8 +429,9 @@ class Player(Life):
                                       'Oh No! The wolf caught your scent! You have to fight')
                                 run=False
                                 continue
-                        elif ch == 'inventory':
-                            self.enact(self.actions[1])
+                        elif ch == 'check inventory':
+                            self.enact(self.premade_function('inventory'))
+                            continue
                         else:
                             return WrongEntry
                 except Exception as Err:
@@ -445,14 +446,14 @@ class Player(Life):
 
             if scouted[2]:#Found a Tree
                 found = True
-                from random import randint
-                lv=self.xp.lvl
-                wood=randint(1*lv,2+1*lv)
-                print('You found a tree. Chop Chop')
-                Wood= self.premade_item('wood')
-                Wood.set_amnt(wood)
                 try:
                     while True:
+                        from random import randint
+                        lv = self.xp.lvl
+                        wood = randint(1 * lv, 2 + 1 * lv)
+                        print('You found a tree. Chop Chop')
+                        Wood = self.premade_item('wood')
+                        Wood.set_amnt(wood)
                         self.subject = Wood
                         self.actions = moves(self.premade_function('chop'),self.premade_function('inventory'),self.premade_function('pass'))
                         cond=self.get_ch()
@@ -466,9 +467,9 @@ class Player(Life):
             if scouted[3]:#Found Berry
                 found = True
                 print("Hey Look! A berry! Should you take it?.. might be poisonous.")
-                self.subject = self.premade_item('berry')
                 while True:
                     try:
+                        self.subject = self.premade_item('berry')
                         self.actions= moves(self.premade_function('collect'),self.premade_function('pass'))
                         self.get_ch()
                         break
@@ -479,12 +480,14 @@ class Player(Life):
                             print('Wrong Entry! Try Again!')
                         else:
                             pass
+                    break
             if scouted[4]:#Found a water source
                 found = True
                 print('You found a water source. Maybe you should refill your Canteen')
-                self.subject = None
+
                 while True:
                     try:
+                        self.subject = None
                         self.actions = moves(self.premade_function('refill'),self.premade_function('pass'))
                         self.get_ch()
                         break
@@ -495,13 +498,14 @@ class Player(Life):
                             print('Wrong Entry! Try Again!')
                         else:
                             print (Err)
+                    break
 
             if scouted[5]:#Found a hen
                 found = True
-                self.subject=self.premade_animal('hen')
                 print('You came across a hen. Chicken for dinner sounds good ...Yum!')
                 while True:
                     try:
+                        self.subject = self.premade_animal('hen')
                         self.actions=moves(self.premade_function('hunt'),self.premade_function('inventory'),self.premade_function('pass'))
                         if self.get_ch():
                             break
@@ -513,12 +517,14 @@ class Player(Life):
                             print('Wrong Entry! Try again!')
                         else:
                             pass
+                    break
+
             if scouted[6]:  # Found a pig
                 found = True
-                self.subject = self.premade_animal('pig')
                 print('You came across a pig. Hmmm....you can already smell the bacon...Yum!')
                 while True:
                     try:
+                        self.subject = self.premade_animal('pig')
                         self.actions = moves(self.premade_function('hunt'), self.premade_function('inventory'),self.premade_function('pass'))
                         if self.get_ch():
                             break
@@ -530,13 +536,14 @@ class Player(Life):
                             print('Wrong Entry! Try Again!')
                         else:
                             pass
+                    break
 
             if scouted[7]: #found Gold
                 found = True
                 print("Huh? What is that shining? Oh, looks like Gold!")
-                self.subject = self.premade_item('gold')
                 while True:
                     try:
+                        self.subject = self.premade_item('gold')
                         self.actions = moves(self.premade_function('collect'),self.premade_function('pass'))
                         self.get_ch()
                         break
@@ -545,10 +552,13 @@ class Player(Life):
                             self.help()
                         elif Err == WrongEntry:
                             print('Wrong Entry! Try Again')
+                    break
             if found:
                 print("Phew! All in a days work...Now what to do?")
             else:
                 print("Maaan! All that walking and you didn't find ANYTHING!? Try again")
+            try:
+                ch = input(Enter>>'')
             return True
         elif func.function_code == 5:# Check Inventory
             print("\n"
@@ -558,6 +568,7 @@ class Player(Life):
                 print('-Nothing in Inventory-')
                 return False
             inv=self.inventory.list_inv()
+            print('0. Exit')
             for i in range(len(inv)):
                 print(f'{str(i+1)}. {inv[i].name}')
             try:
@@ -566,8 +577,13 @@ class Player(Life):
                     items:item=self.inventory[ch-1]
                     self.subject = items
                     print(items)
-                    self.actions = moves(items.att[0], self.premade_function('return'))
+                    try:
+                        self.actions = moves(items.att[0], self.premade_function('return'))
+                    except:
+                        self.actions = moves(self.premade_function('return'))
                     self.get_ch()
+                elif ch == 0:
+                    return False
             except Exception as Err:
                 if Err == NeedHelp:
                     self.help()
@@ -599,7 +615,7 @@ class Player(Life):
 
         elif func.function_code == 7:# Refill
             print('Ah....That was a good drink. You fill your canteen\n')
-            self.hydration = self.hp / 10
+            self.hydration = self.max_hp / 10
             water = self.premade_item('water')
             water.set_amnt(5)
             self.inventory.add_inv(water)
@@ -618,9 +634,9 @@ class Player(Life):
                     print("You don't touch it. Could be deadly. You will never know.")
                 if items.name == 'Gold':
                     print("Nah....looks like Fool's Gold...you walk away from the gold. A Fool!")
-            if type(self.subject) == Tree:
-                print('Meh...Extra wood is just extra baggage...You can probably make do with what you got')
-            if type(self.subject) == None:
+                if item.name == 'Wood':
+                    print('Meh...Extra wood is just extra baggage...You can probably make do with what you got')
+            else:
                 print('Na..Too lazy, besides your not thirsty... Yet.')
             print()
             return True
@@ -650,6 +666,8 @@ class Player(Life):
                 print(e)
 
         elif func.function_code == 11:# Heal
+            print("""Mmm..that was surprisingly good. You swallow...
+A warmth spread over you. Check your Hp.""")
             self.regenerate(50)
             self.inventory.use_item(self.subject)
 
@@ -661,7 +679,7 @@ class Player(Life):
                 return False
 
         elif func.function_code == 13:# Return
-            return
+            return f'\n'
 
     def collect(self,items:item):
         print(f'You collected {str(items.amnt)}x{items.name}')

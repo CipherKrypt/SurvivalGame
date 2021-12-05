@@ -177,7 +177,7 @@ class inventory():
     def add_inv(self,items:item):
         c=0
         for i in self.list_inv():
-            if i == items.name.lower():
+            if i.name.lower() == items.name.lower():
                 amnt=items.amnt
                 self.inventory[c].add_item(amnt)
                 return
