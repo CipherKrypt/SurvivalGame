@@ -37,7 +37,7 @@ class Exp():
     def __str__(self):
         return f'Level: {str(self.lvl)} XP: {str(self.xp)} Next Level in: {str(self.next_lvl-self.xp)}'
 
-    def check_xp(self,lvl_up:False):
+    def check_xp(self,lvl_up=False):
         if self.xp==self.next_lvl:
             self.xp=0
             self.lvl+=1
@@ -54,10 +54,10 @@ class Exp():
         else:
             self.check_xp(True)
 
-    def add_xp(self,xp:int):
+    def add_xp(self,xp:float or int):
         self.xp+=xp
         self.check_xp()
-        print(f'You got {xp} XP!')
+        print(f'You got +{xp} XP!')
 
 
 
@@ -106,7 +106,9 @@ class Player(Life):
             equiped='Nothing'
         else:
             equiped=self.equip.name
-        return f'Your Hp: {str(self.hp)}/{str(self.max_hp)} Hydration: {str(self.hydration)} Energy: {str(self.energy)} Equiped: {equiped}'
+        return f'You:\n' \
+               f'|Level: {str(self.xp.lvl)}|Xp:{str(self.xp.xp)}/{str(self.xp.next_lvl)}|\n' \
+               f'|Hp: {str(self.hp)}/{str(self.max_hp)}|Hydration: {str(self.hydration)}|Energy: {str(self.energy)}|Equiped: {equiped}|'
 
     def cycle(self):
         print()
@@ -114,31 +116,34 @@ class Player(Life):
             self.day+=1
             self.turn=1
             self.location.decrease_attribute('w', 30)
+            print("Dawn arrives...A brand new day! but the same ol' routine -eye roll-\n")
         else:
             self.turn+=1
         if self.turn >=5:
             self.location.increase_attribute('w',30)
+            print("It's dark ALREADY! -wood snaps- Wait! is that a wolf?\n")
         if self.day == 30:
             self.game_over(Survived)
             return
-        self.hydration-=2*self.location.thirst_mult
+        self.hydration-=4*self.location.thirst_mult
         if self.hydration<=0:
             self.game_over(DeathByDehydration)
             return
-        if self.hydration<=20:
-            print(f'(!) Your Hydaration is {str(self.hydration)}. You need Water stat! Keep it above 20 else you lose energy!')
+        if self.hydration<=30:
+            print(f'(!) Your Hydaration is {str(self.hydration)}. You need Water stat! Keep it above 30 else you lose energy!')
             self.energy-=5
-        self.energy-=5
+        self.energy-=2
         if self.energy>=50:
             self.regenerate(5*self.xp.lvl)
-        if self.energy<=30:
-            print(f'(!) Your Energy is {str(self.energy)}. You need Food stat! Keep it above 30 else you lose Hp!')
+        if self.energy<=20:
+            print(f'(!) Your Energy is {str(self.energy)}. You need Food stat! Keep it above 20 else you lose Hp!')
             if self.hit(5):
                 self.game_over(DeathByStarvation)
                 return
         if self.energy<=0:
             self.game_over(DeathByStarvation)
             return
+        self.regenerate(20)
         if self.hp <=100:
             print(f'(!)Your Hp is at a Critical Level. Only {str(self.hp)} HP left. Be careful! Try to Heal!')
 
@@ -221,7 +226,7 @@ class Player(Life):
 
     def premade_location(self,location_name:str)->Location:
         if location_name == 'wild':
-            location = Location('Wilderness', 1.5, 0, 10, 50, 50, 10, 30, 40, 20, 10, 20)
+            location = Location('Wilderness', 1.25, 0, 10, 50, 50, 10, 30, 40, 20, 10, 20)
         else:
             return NotAnAttribute
         return location
@@ -260,6 +265,10 @@ class Player(Life):
             fun = function('Evaded',12,escape)
         elif function_name == 'return':
             fun = function('Return',13,0)
+        elif function_name == 'shop':
+            fun = function('Shop',14,0)
+        elif function_name == 'buy':
+            fun = function('Buy',15,0)
         elif function_name == 'damage':
             fun = function('Damage',0,20)
         elif function_name == 'chopper':
@@ -272,23 +281,25 @@ class Player(Life):
             return NotAnAttribute
         return fun
 
-    def premade_item(self,item_name:str)-> item:
+    def premade_item(self,item_name:str)-> item or shop:
         if item_name == 'water':
-            Item = item('Water',5,'A Consumable that will replenish Hydration by 5 points',moves(self.premade_function('drink')))
+            Item = item('Water',5,'A Consumable that will replenish Hydration by 5 points',moves(self.premade_function('drink')),1)
         elif item_name == 'wood':
-            Item = item('Wood',1,'Consumable dropped by Trees',None)
+            Item = item('Wood',1,'Consumable dropped by Trees',None,2)
         elif item_name == 'chicken':
-            Item = item('Meat',1,'Consumable dropped by Hen and Pig that will replenish Energy by 5 points',moves(self.premade_function('eat')))
+            Item = item('Meat',1,'Consumable dropped by Hen and Pig that will replenish Energy by 5 points',moves(self.premade_function('eat')),1)
         elif item_name == 'pork':
-            Item = item('Meat', 2, 'Consumable dropped by Hen and Pig that will replenish Energy',moves(self.premade_function('eat')))
+            Item = item('Meat', 2, 'Consumable dropped by Hen and Pig that will replenish Energy',moves(self.premade_function('eat')),1)
         elif item_name == 'axe':
-            Item = item('Axe',1,'An item that can be equipped to cut down trees',moves(self.premade_function('equip'),self.premade_function('chopper'),self.premade_function('damage')))
+            Item = item('Axe',1,'An item that can be equipped to cut down trees and maybe even deal some damage',moves(self.premade_function('equip'),self.premade_function('chopper'),self.premade_function('damage')),2)
         elif item_name == 'berry':
-            Item = item('Berry',1,'A Consumable that will replenish HP',moves(self.premade_function('heal')))
+            Item = item('Berry',1,'A Consumable that will replenish HP and Energy',moves(self.premade_function('heal')),2)
         elif item_name == 'gold':
-            Item = item('Gold',1,'Gold can be found or dropped by wolves. Use it to buy items from merchants',None)
+            Item = item('Gold',1,'Gold can be found or dropped by wolves. Use it to buy items from merchants',None,0)
         elif item_name == 'torch':
-            Item = item('Torch',1,'An item that consumes 1xwood per cycle to provide fire and ward off Wolves when equiped',moves(self.premade_function('equip'),self.premade_function('light'),self.premade_function('fire')))
+            Item = item('Torch',1,'An item that consumes 1xwood per cycle to provide fire and ward off Wolves when equiped',moves(self.premade_function('equip'),self.premade_function('light'),self.premade_function('fire')),4)
+        elif item_name == 'shop':
+            Item = shop(self.premade_item('water'),self.premade_item('chicken'),self.premade_item('wood'),self.premade_item('berry'),self.premade_item('torch'))
         else:
             return NotAnAttribute
         return Item
@@ -320,8 +331,8 @@ class Player(Life):
 
     def enact(self,func:function):
         if func.function_code == 1:#
-            cond = self.inventory.use_item('water')
-            if cond:
+            items=self.subject
+            if items.sub_item():
                 max_val=self.max_hp/10
                 max_val = float(max_val)
                 if self.hydration == max_val:
@@ -338,8 +349,8 @@ class Player(Life):
                 print()
                 return False
         elif func.function_code == 2:# Eat
-            cond = self.inventory.use_item('meat')
-            if cond:
+            items = self.subject
+            if items.sub_item():
                 max_val = self.max_hp / 10
                 max_val = float(max_val)
                 if self.inventory.use_item('meat'):
@@ -401,11 +412,17 @@ class Player(Life):
                                     print('You need to equip something that can deal damage\n')
                                     continue
                                 elif ch == 'attack' and 'damage' in self.equip.att.list_it():
-                                    print(f'You dealed {str(30*self.equip.att[1].var)} Damage.\n')
-                                    if wolf.hit(30*self.equip.att[1].var):
-                                        print(f'Phew! The wolf ran way....Woah it dropped {wolf.drops.content()} !')
+                                    from random import randint,choice
+                                    dam=randint(10*self.xp.lvl,30+10*self.xp.lvl)
+                                    D=[0]
+                                    for i in range(1+self.xp.lvl):
+                                        D.append(dam)
+                                    dam=choice(D)*self.equip.att[1].var
+                                    print(f'You dealed {str(dam)} Damage.\n')
+                                    if wolf.hit(dam):
+                                        print(f'Phew! The wolf ran way....Woah it dropped {wolf.drops.content()}d !')
+                                        self.xp.add_xp((wolf.max_hp / 10))
                                         self.collect(wolf.drops.collect(self.inventory))
-                                        self.xp.add_xp(wolf.max_hp%10)
                                         break
                                 else:
                                     print('You need to equip something that can deal damage\n')
@@ -433,7 +450,7 @@ class Player(Life):
                             self.enact(self.premade_function('inventory'))
                             continue
                         else:
-                            return WrongEntry
+                            continue
                 except Exception as Err:
                     if Err == NeedHelp:
                         self.help()
@@ -553,19 +570,48 @@ class Player(Life):
                         elif Err == WrongEntry:
                             print('Wrong Entry! Try Again')
                     break
+            if scouted[0]: # Merchant
+                found = True
+                print("\nMerchant: Hola Amigo!\n"
+                      "          I have useful trinkets. Give you good price!\n"
+                      "What! A Mexican Merchant! Way out here!? Are you saved!"
+                      "It took only a few tries to understand that you just heard the only english he know.\n"
+                      "-sigh- You are stuck here for longer... You look at him.\n"
+                      "He is kinda shady... but maybe there is no harm in checking what he has...\n")
+                while True:
+                    try:
+                        self.subject=self.premade_item('shop')
+                        self.actions= moves(self.premade_function('shop'),self.premade_function('pass'))
+                        if self.get_ch():
+                            break
+                    except:
+                        pass
+                    break
             if found:
                 print("Phew! All in a days work...Now what to do?")
             else:
                 print("Maaan! All that walking and you didn't find ANYTHING!? Try again")
+            print()
             try:
-                ch = input(Enter>>'')
-            return True
+                while True:
+                    print('Do you want to...\n'
+                          'end scout   check inventory')
+                    ch = input('Enter>> ')
+                    ch = ch.lower().lstrip().rstrip()
+                    if ch == 'check inventory':
+                        self.enact(self.premade_function('inventory'))
+                    elif ch == 'end scout':
+                        return True
+                    else:
+                        continue
+            except:
+                return True
         elif func.function_code == 5:# Check Inventory
             print("\n"
                   "Your Inventory\n"
                   "---------------")
-            if self.inventory == None:
-                print('-Nothing in Inventory-')
+            if self.inventory.content() == []:
+                print('-Nothing in Inventory-\n')
                 return False
             inv=self.inventory.list_inv()
             print('0. Exit')
@@ -573,7 +619,10 @@ class Player(Life):
                 print(f'{str(i+1)}. {inv[i].name}')
             try:
                 ch = int(input('Enter item number>> '))
-                if ch <= len(inv)+1:
+                if ch == 0:
+                    print()
+                    return False
+                elif ch <= len(inv)+1:
                     items:item=self.inventory[ch-1]
                     self.subject = items
                     print(items)
@@ -582,8 +631,7 @@ class Player(Life):
                     except:
                         self.actions = moves(self.premade_function('return'))
                     self.get_ch()
-                elif ch == 0:
-                    return False
+
             except Exception as Err:
                 if Err == NeedHelp:
                     self.help()
@@ -596,19 +644,21 @@ class Player(Life):
             animal = self.subject
             if animal.animal == 'Hen':
                     if self.enact(animal.move[0]):
-                        print("Sheesh! It got away... Maybe next time.")
+                        print("Sheesh! It got away... Maybe next time.\n")
                         return True
                     else:
                         print(f'Here...buck.buck.buck.. -catches hen- Nice! got {animal.drops.content()}!')
+                        self.xp.add_xp(10)
                         self.collect(animal.drops.collect(self.inventory))
                         return True
 
             if animal.animal == 'Pig':
                 if self.enact(animal.move[0]):
-                    print("Man! That pig was FAST!... So much for your bacon -eyeroll-.")
+                    print("Man! That pig was FAST!... So much for your bacon -eyeroll-.\n")
                     return True
                 else:
                     print(f'If you move reeeaaalll slow, you might become invisible -catches pig- Cool! got {animal.drops.content()}!')
+                    self.xp.add_xp(10)
                     self.collect(animal.drops.collect(self.inventory))
                     return True
 
@@ -616,12 +666,13 @@ class Player(Life):
         elif func.function_code == 7:# Refill
             print('Ah....That was a good drink. You fill your canteen\n')
             self.hydration = self.max_hp / 10
+            self.regenerate(10)
             water = self.premade_item('water')
             water.set_amnt(5)
             self.inventory.add_inv(water)
-            print(f'{str(water.amnt)}xWater added to Inventory\n')
 
         elif func.function_code == 8:# Pass
+            print()
             if type(self.subject) == Animal:
                 animal = self.subject
                 if animal.animal == 'Hen':
@@ -634,8 +685,13 @@ class Player(Life):
                     print("You don't touch it. Could be deadly. You will never know.")
                 if items.name == 'Gold':
                     print("Nah....looks like Fool's Gold...you walk away from the gold. A Fool!")
-                if item.name == 'Wood':
+                if items.name == 'Wood':
                     print('Meh...Extra wood is just extra baggage...You can probably make do with what you got')
+                if items.name == 'Gold':
+                    print("Nah! It might be Fool's gold for all you know... You walk away... A FOOL!")
+            if type(self.subject) == shop:
+                print("Maybe not... the last thing you need is diarrhea from eating tacos. -shivers at the thought of it-\n"
+                      "'Adios! strange Mexican merchant..' you walk away...")
             else:
                 print('Na..Too lazy, besides your not thirsty... Yet.')
             print()
@@ -654,9 +710,9 @@ class Player(Life):
                     return False
                 elif 'chopper' in self.equip.att.list_it():
                     m = self.equip.att["chopper"].var
-                    print('Heave Ho! annnndddd.... Lumber!\n')
+                    print('\nHeave Ho! annnndddd.... Lumber!\n')
+                    self.xp.add_xp(2)
                     wood.set_amnt(wood.amnt * m)
-                    print(f'Nice! You collected {str(wood.amnt)}xWood.\n')
                     self.inventory.add_inv(wood)
                     return True
                 else:
@@ -679,10 +735,46 @@ A warmth spread over you. Check your Hp.""")
                 return False
 
         elif func.function_code == 13:# Return
-            return f'\n'
+            return True
+
+        elif func.function_code == 14:# Shop
+            Shop = self.subject
+            while True:
+                print(Shop)
+                try:
+                    ch = int(input('Enter item number>> '))
+                    if ch == 0:
+                        print("\n")
+                        return False
+                    elif ch<= len(Shop.list_it()):
+                        while True:
+                            items= Shop[ch-1]
+                            print("\n"
+                                  f"Item Name: {items.name}\n"
+                                  f"Description: {items.desc}\n"
+                                  f"Cost: {items.cost} Gold pieces\n")
+                            self.subject = items
+                            self.actions = moves(self.premade_function('buy'),self.premade_function('return'))
+                            if self.get_ch():
+                                break
+                except:
+                    pass
+
+        elif func.function_code == 15: # Buy
+            items = self.subject
+            if self.inventory.use_item('gold',items.cost):
+                print("Ka-Ching! The deals been done!\n")
+                self.inventory.add_inv(items.set_amnt(1))
+                return False
+            else:
+                print(f"Merchant:Oye Amigo! you don't have enough gold.\n")
+                return True
+
+
+
+
 
     def collect(self,items:item):
-        print(f'You collected {str(items.amnt)}x{items.name}')
         print()
         self.inventory.add_inv(items)
 

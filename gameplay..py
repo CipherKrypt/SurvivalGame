@@ -18,39 +18,61 @@ print(player)
 #print(player)
 '''
 def main_menu():
-    print('Main Menu')
-    print("Type 'quit' to Quit")
-    print('<Press Enter to start Game>')
+    print('''
+    
+        :'######::'##::::'##:'########::'##::::'##:'####:'##::::'##::::'###::::'##::::::::'######::::::'###::::'##::::'##:'########:
+        '##... ##: ##:::: ##: ##.... ##: ##:::: ##:. ##:: ##:::: ##:::'## ##::: ##:::::::'##... ##::::'## ##::: ###::'###: ##.....::
+         ##:::..:: ##:::: ##: ##:::: ##: ##:::: ##:: ##:: ##:::: ##::'##:. ##:: ##::::::: ##:::..::::'##:. ##:: ####'####: ##:::::::
+        . ######:: ##:::: ##: ########:: ##:::: ##:: ##:: ##:::: ##:'##:::. ##: ##::::::: ##::'####:'##:::. ##: ## ### ##: ######:::
+        :..... ##: ##:::: ##: ##.. ##:::. ##:: ##::: ##::. ##:: ##:: #########: ##::::::: ##::: ##:: #########: ##. #: ##: ##...::::
+        '##::: ##: ##:::: ##: ##::. ##:::. ## ##:::: ##:::. ## ##::: ##.... ##: ##::::::: ##::: ##:: ##.... ##: ##:.:: ##: ##:::::::
+        . ######::. #######:: ##:::. ##:::. ###::::'####:::. ###:::: ##:::: ##: ########:. ######::: ##:::: ##: ##:::: ##: ########:
+        :......::::.......:::..:::::..:::::...:::::....:::::...:::::..:::::..::........:::......::::..:::::..::..:::::..::........::
+
+
+                        ___  ____ ____ ____ ____   ____ _  _ ___ ____ ____   ___ ____   ___  _    ____ _   _ 
+                        |__] |__/ |___ [__  [__    |___ |\ |  |  |___ |__/    |  |  |   |__] |    |__|  \_/  
+                        |    |  \ |___ ___] ___]   |___ | \|  |  |___ |  \    |  |__|   |    |___ |  |   |  
+''')
+
     while True:
-        ch=input('> ')
+        ch=input('')
         ch = ch.lower().lstrip().rstrip()
-        if ch == 'quit':
-            raise SystemExit
-        elif ch == '':
+        if ch == '':
             print('''
-                           -you open your eyes-
-            'Wait? Where are am I?...Ack! what's in mouth -spit out sand-'
-            You are so confused...That's when your memory rushed back!
-            You signed up for a cruise...A trip on a luxury ship going to a luxurious island.
-            Well on way, your friends dared to jump aboard... swim a while and board the ship again.
-            You are a pretty strong swimmer. So...why not?
-            But what you didn't expect is the current to be so...strong.
-            It pulled you under...
-            Your friends expected to pop up any moment... You never did
-            The waves pulled you further and further away from your ship. 
-            All you could remember after that is pure panic.
-            Now you are here... 
-            You pick an old rusty axe... fashion a canteen out of leaves
-            Now all you need do is to survive till help arrives.
-            And if you die along the way... Well at least you got to go to an island
-            not Luxurious though....
+                                              ___  ____ ____ _    ____ ____ _  _ ____ 
+                                              |__] |__/ |  | |    |  | | __ |  | |___ 
+                                              |    |  \ |__| |___ |__| |__] |__| |___
+                            _________________________________________________________________________
+                                                     -you open your eyes-
+                               'Wait? Where are am I?...Ack! what's in my mouth -spits out sand-'
+                                   You are so confused...That's when your memory rushed back!
+                               You signed up for a cruise...A trip on a luxury ship going to a 
+                              luxurious island. Well on way, your friends dared to jump aboard... 
+                                          swim a while and board the ship again.
+                                    You are a pretty strong swimmer. So...why not?
+                                But what you didn't expect is the current to be so...strong.
+                                                  It pulled you under...
+                              Your friends expected to pop up any moment... You never did...
+                              The waves pulled you further and further away from your ship. 
+                                    All you could remember after that is pure panic.
+                                                   Now you are here... 
+                             You pick an old rusty axe... fashion a canteen out of leaves
+                                 Now all you need do is to survive till help arrives.
+                            And if you die along the way... Well at least you got to go to an island
+                                                   not Luxurious though....
+                    
+                                    <type in 'help' or '!h' anytime to pull up the Help Menu>
+                            ---------------------------------------------------------------------------
             
-                <type in 'help' or '!h' anytime to pull up the Help Menu>
-            
-            ''')
+
+It's bright out here...
+You better find water and food soon
+There are probably wild animals too...
+Yay -sarcasm-''')
             game_loop()
         else:
-            pass
+            raise SystemExit
 
 def game_loop():
     while not player.is_dead():
@@ -65,5 +87,5 @@ def game_loop():
                      -GAME OVER-
     ''')
     main_menu()
-
+S
 main_menu()

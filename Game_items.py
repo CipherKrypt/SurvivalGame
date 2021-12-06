@@ -70,11 +70,12 @@ class moves:
         return det
 
 class item():
-    def __init__(self,name:str,amnt:int,desc:str,att:moves or None):
+    def __init__(self,name:str,amnt:int,desc:str,att:moves or None,cost:int):
         self.name=name
         self.amnt: int =amnt
         self.desc=desc
         self.att:moves or None =att
+        self.cost:int = cost
 
     def __str__(self):
         Att=''
@@ -118,12 +119,15 @@ class item():
         if amnt == None:
             if self.check_amnt():
                 self.amnt-=1
+                return True
+            else:
+                return False
         else:
             if self.check_amnt(amnt):
                 self.amnt-=amnt
+                return True
             else:
-                raise NotEnoughItems
-        return self.check_amnt()
+                return False
 
     def check_amnt(self,amnt:int=None)->bool:
         if amnt == None:
@@ -176,10 +180,13 @@ class inventory():
 
     def add_inv(self,items:item):
         c=0
-        for i in self.list_inv():
+        for i in self.inventory:
             if i.name.lower() == items.name.lower():
                 amnt=items.amnt
-                self.inventory[c].add_item(amnt)
+                total=i.amnt
+                total+=amnt
+                i.set_amnt(total)
+                print(f'{items.amnt}x{items.name} added to inventory\n')
                 return
             else:
                 c+=1
@@ -187,25 +194,32 @@ class inventory():
             self.inventory.append(items)
             print(f'New Item {items.name} added to inventory\n'
                   f'{items.desc}\n')
+            print(f'{items.amnt}x{items.name} added to inventory\n')
 
-    def use_item(self,itim:str)->bool:
+    def use_item(self,itim:str,amnt:int=1)->bool:
         try:
             for m in self.inventory:
                 if itim.lower() == m.name.lower():
-                    items=m
-                    if items.sub_item():
-                        if items.amnt == 0:
-                            self.inventory.remove(items)
-                return True
+                    if m.sub_item(amnt):
+                        if m.amnt == 0:
+                            print(self.inventory)
+                            self.inventory.remove(m)
+                        return True
+                    else:
+                        return False
+
             else:
                 return False
-        except Exception as E:
+        except:
             return False
 
     def content(self):
         content=[]
-        for item in self.inventory:
-            content.append(item.name.lower)
+        try:
+            for item in self.inventory:
+                content.append(item.name.lower)
+        except:
+            return []
         return content
 
 class drop():
@@ -225,20 +239,50 @@ class drop():
         content=''
         for item in self.drop:
             content+=item.name.capitalize()+' and '
-        content = content.rstrip(' and ')
+        content = content.rstrip('and ')
         return content
 
     def collect(self,player_inv:inventory):
         for item in self.drop:
             player_inv.add_inv(item)
-            print()
-            print(f'You added {str(item.amnt)}x{item.name} into your inventory')
 
 
-
-
-
-
-
+class shop():
+    def __init__(self,*items:item):
+        self.Shop =list()
+        for i in items:
+            self.Shop.append(i)
+            
+    def __str__(self):
+        string=f"Merchant's Trinkets\n" \
+               f"0. Exit\n"
+        for items in self.list_it():
+            string+=f"{items}\n"
+        return string
+        
+    def __getitem__(self, index):
+        if type(index) == int:
+            c=0
+            for i in self.Shop:
+                if index == c:
+                    return i
+                else:
+                    c+=1
+            else:
+                raise IndexError("Object Shop out of Index")
+        if type(index) == str:
+            for i in self.Shop:
+                if index.lower() == i.name.lower():
+                    return i
+            else:
+                raise ValueError(f"{index} is not in Inventory")
+        
+    def list_it(self):
+        L=[]
+        c = 1
+        for i in self.Shop:
+            L.append(f"{c}. {i.name} : {i.desc}")
+            c+=1
+        return L
 
 
