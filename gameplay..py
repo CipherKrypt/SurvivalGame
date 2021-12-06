@@ -53,14 +53,14 @@ def main_menu():
                                     You are a pretty strong swimmer. So...why not?
                                 But what you didn't expect is the current to be so...strong.
                                                   It pulled you under...
-                              Your friends expected to pop up any moment... You never did...
+                              Your friends expected you to pop up any moment... You never did...
                               The waves pulled you further and further away from your ship. 
                                     All you could remember after that is pure panic.
                                                    Now you are here... 
                              You pick an old rusty axe... fashion a canteen out of leaves
                                  Now all you need do is to survive till help arrives.
                             And if you die along the way... Well at least you got to go to an island
-                                                   not Luxurious though....
+                                                 not a Luxurious one though....
                     
                                     <type in 'help' or '!h' anytime to pull up the Help Menu>
                             ---------------------------------------------------------------------------
@@ -87,5 +87,6 @@ def game_loop():
                      -GAME OVER-
     ''')
     main_menu()
-S
+
+
 main_menu()

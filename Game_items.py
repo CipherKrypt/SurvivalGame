@@ -118,13 +118,15 @@ class item():
     def sub_item(self,amnt:int=None)->bool:
         if amnt == None:
             if self.check_amnt():
-                self.amnt-=1
+                n=self.amnt
+                self.amnt=n-1
                 return True
             else:
                 return False
         else:
             if self.check_amnt(amnt):
-                self.amnt-=amnt
+                n=self.amnt
+                self.amnt=n-amnt
                 return True
             else:
                 return False
@@ -136,7 +138,7 @@ class item():
             else:
                 return False
         else:
-            if amnt>=self.amnt:
+            if amnt<=self.amnt:
                 return True
             else:
                 return False
@@ -196,10 +198,12 @@ class inventory():
                   f'{items.desc}\n')
             print(f'{items.amnt}x{items.name} added to inventory\n')
 
-    def use_item(self,itim:str,amnt:int=1)->bool:
+    def use_item(self,itim:str,amnt=1)->bool:
         try:
             for m in self.inventory:
+                print(itim.lower(),m.name.lower())
                 if itim.lower() == m.name.lower():
+                    print(m)
                     if m.sub_item(amnt):
                         if m.amnt == 0:
                             print(self.inventory)

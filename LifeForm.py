@@ -45,11 +45,12 @@ class Exp():
         elif self.xp>self.next_lvl:
             self.xp-=self.next_lvl
             self.lvl+=1
+            print(f'Woah! You Leveled Up... Level{str(self.lvl)}')
             self.next_lvl*=2
         if self.xp<self.next_lvl:
             if lvl_up:
-                print('Woah! You Leveled Up...')
-                print(self.xp)
+                print()
+                print(self.lvl)
             return
         else:
             self.check_xp(True)
@@ -106,8 +107,7 @@ class Player(Life):
             equiped='Nothing'
         else:
             equiped=self.equip.name
-        return f'You:\n' \
-               f'|Level: {str(self.xp.lvl)}|Xp:{str(self.xp.xp)}/{str(self.xp.next_lvl)}|\n' \
+        return f'You:|Level: {str(self.xp.lvl)}|Xp:{str(self.xp.xp)}/{str(self.xp.next_lvl)}|\n' \
                f'|Hp: {str(self.hp)}/{str(self.max_hp)}|Hydration: {str(self.hydration)}|Energy: {str(self.energy)}|Equiped: {equiped}|'
 
     def cycle(self):
@@ -143,7 +143,8 @@ class Player(Life):
         if self.energy<=0:
             self.game_over(DeathByStarvation)
             return
-        self.regenerate(20)
+        self.regenerate(10+10*self.xp.lvl)
+        print(f"You healed +{str(10+10*self.xp.lvl)} HP")
         if self.hp <=100:
             print(f'(!)Your Hp is at a Critical Level. Only {str(self.hp)} HP left. Be careful! Try to Heal!')
 
@@ -183,11 +184,53 @@ class Player(Life):
                   "You died")
         elif Err == Survived:
             print("\n"
-                  "Oh no... is that Thunder!? It's going to rain!?...\n"
-                  "Wait...it isn't thunder... it's....'\n"
-                  "A Helicopter!!! It's landing by the beach! You run towards the Helicopter\n"
-                  "Your saved!"
-                  "Or are you.....")
+              """
+                                                                  ____ ___  _ _    ____ ____ _  _ ____ 
+                                                                  |___ |__] | |    |  | | __ |  | |___ 
+                                                                  |___ |    | |___ |__| |__] |__| |___
+                                                                  
+                                                                  
+                                                                            -soft buzz-
+                                                    Oh no... is that a swarm of bees!? REALLY!? wolves and now this!...
+                                              Yup...Moms do know best!! She did tell you to take a tube of insect repellent.
+                                                          If only you had listened to your Mom and brought it...
+                                                                        -buzz turns into roar-
+                                                You look up... something like a huge bee is headed your direction...is it?...
+                                                A Helicopter!!! It's landing by the beach! Finally someone came to save you!
+                                                 You run towards it...braving the wind...shielding your eyes from the dust
+                                                 One of the passenger hold out his hand....you reach out...you are saved -
+                                                 
+                                                                        -    GAME OVER   -
+                                                                               Huh!?    
+                                                   Where are you? It's pitch black? What's this 'GAME OVER' display??
+                                                     You feel like your head is being pulled up! Argh! The Light!!!                                             
+                                                    'Dear sir, please relax... you just experienced an immersive reality'
+                                                              'My Imminent Reality!!! I'm going to die!?'
+                                                     'No sir, Immersive Reality...like VR but... just more real' -winks-
+                                             'But....Why am I here? Where's my family? Mom!! I need to tell here she was right!'
+                                             'Don't worry sir...you are one of our many willing participants...you don't remember
+                                             because you are disoriented. You will in due time. Anyway, please fill out a form 
+                                             regarding your experience using IR, collect your payment and you can be on your way.'
+                                                                            'Wait! I am paid!?' 
+                                                'Ha! Yes sir... NOW you seem energetic -laughs- anyway...right this way'
+                                               He opens a door for you. You clearly can't remember signing up for any IR...
+                                              But well...you might remember it soon enough...Time to collect your payment.
+                                                           You follow him... at least you are safe right?
+                                                                              or are you....
+                                                                              
+                                                                              - THE END -
+                                                                  
+                                                         No animals were harmed during the creation of this game.
+                                                    Any resemblance to any code in existance is purely a coincidence.
+                                                                    
+                                                               _______ _______ _______ _____  ______ _______
+                                                              |     __|   _   |    |  |     \|   __ \       |
+                                                              |__     |       |       |  --  |      <   -   |
+                                                              |_______|___|___|__|____|_____/|___|__|_______|
+                                                                  
+                                        01110011 01110101 01100010 01101001 01101110 01110011 01110101 01110010 01100101 01110011 01101000
+                                                                  """
+                  )
         self.hp=0
 
     def help(self):
@@ -257,7 +300,7 @@ class Player(Life):
         elif function_name == 'bite':
             fun = function('Bit',0,30)
         elif function_name == 'heal':
-            fun = function('Eat',11,20)
+            fun = function('Eat',11,50)
         elif function_name == 'evade':
             escape=52-2*self.xp.lvl
             if escape <0:
@@ -283,23 +326,25 @@ class Player(Life):
 
     def premade_item(self,item_name:str)-> item or shop:
         if item_name == 'water':
-            Item = item('Water',5,'A Consumable that will replenish Hydration by 5 points',moves(self.premade_function('drink')),1)
+            Item = item('Water',5,'A Consumable that will give +5 Hydration',moves(self.premade_function('drink')),1)
         elif item_name == 'wood':
-            Item = item('Wood',1,'Consumable dropped by Trees',None,2)
+            Item = item('Wood',1,'Consumable dropped by trees...used as fuel for torches.',None,2)
         elif item_name == 'chicken':
-            Item = item('Meat',1,'Consumable dropped by Hen and Pig that will replenish Energy by 5 points',moves(self.premade_function('eat')),1)
+            Item = item('Meat',1,'Consumable dropped by Hen and Pig that will give +5 Energy',moves(self.premade_function('eat')),1)
         elif item_name == 'pork':
-            Item = item('Meat', 2, 'Consumable dropped by Hen and Pig that will replenish Energy',moves(self.premade_function('eat')),1)
+            Item = item('Meat', 2, 'Consumable dropped by Hen and Pig that will give +5 Energy',moves(self.premade_function('eat')),1)
         elif item_name == 'axe':
             Item = item('Axe',1,'An item that can be equipped to cut down trees and maybe even deal some damage',moves(self.premade_function('equip'),self.premade_function('chopper'),self.premade_function('damage')),2)
         elif item_name == 'berry':
-            Item = item('Berry',1,'A Consumable that will replenish HP and Energy',moves(self.premade_function('heal')),2)
+            Item = item('Berry',1,'A Consumable that will replenish give +50 Hp and +10 Energy',moves(self.premade_function('heal')),2)
         elif item_name == 'gold':
             Item = item('Gold',1,'Gold can be found or dropped by wolves. Use it to buy items from merchants',None,0)
         elif item_name == 'torch':
             Item = item('Torch',1,'An item that consumes 1xwood per cycle to provide fire and ward off Wolves when equiped',moves(self.premade_function('equip'),self.premade_function('light'),self.premade_function('fire')),4)
+        elif item_name == 'taco':
+            Item = item('Taco',1,'Consumable sold my the merchant...known to cause diarrhea...but also give +20 Energy',moves(self.premade_function('eat').set_var(20)),3)
         elif item_name == 'shop':
-            Item = shop(self.premade_item('water'),self.premade_item('chicken'),self.premade_item('wood'),self.premade_item('berry'),self.premade_item('torch'))
+            Item = shop(self.premade_item('water'),self.premade_item('chicken'),self.premade_item('wood'),self.premade_item('berry'),self.premade_item('taco'),self.premade_item('torch'))
         else:
             return NotAnAttribute
         return Item
@@ -353,18 +398,17 @@ class Player(Life):
             if items.sub_item():
                 max_val = self.max_hp / 10
                 max_val = float(max_val)
-                if self.inventory.use_item('meat'):
-                    if self.energy == float(max_val):
-                        print("You weren't hungry, but today is cheat day")
+                if self.energy == float(max_val):
+                    print("You weren't hungry, but today is cheat day")
 
+                else:
+                    print('Maaaan!That was good!')
+                    if float(self.energy + func.var) >= float(max_val):
+                        self.energy = max_val
+                        print('You have full Energy')
                     else:
-                        print('Maaaan!That was good!')
-                        if float(self.energy + func.var) >= float(max_val):
-                            self.energy = max_val
-                            print('You have full Energy')
-                        else:
-                            self.energy += func.var
-                            print(f'Energy + {func.var}')
+                        self.energy += func.var
+                        print(f'Energy + {func.var}')
                 print()
                 return False
         elif func.function_code == 3:# Equip
@@ -574,7 +618,7 @@ class Player(Life):
                 found = True
                 print("\nMerchant: Hola Amigo!\n"
                       "          I have useful trinkets. Give you good price!\n"
-                      "What! A Mexican Merchant! Way out here!? Are you saved!"
+                      "What! A Mexican Merchant! Way out here!? Are you saved!\n"
                       "It took only a few tries to understand that you just heard the only english he know.\n"
                       "-sigh- You are stuck here for longer... You look at him.\n"
                       "He is kinda shady... but maybe there is no harm in checking what he has...\n")
@@ -722,10 +766,18 @@ class Player(Life):
                 print(e)
 
         elif func.function_code == 11:# Heal
-            print("""Mmm..that was surprisingly good. You swallow...
-A warmth spread over you. Check your Hp.""")
-            self.regenerate(50)
-            self.inventory.use_item(self.subject)
+            if self.subject.sub_item():
+                print("""Mmm..that was surprisingly good. You swallow...
+    A warmth spread over you. Check your Hp.""")
+                self.regenerate(50)
+                print("+50 HP")
+                max_val=self.max_hp/10
+                if self.energy+10 >= max_val:
+                    self.energy = max_val
+                    print("Energy renewed")
+                else:
+                    self.energy += 10
+                    print("+10 Energy")
 
         elif func.function_code == 12:# Evade
             from random import randint
