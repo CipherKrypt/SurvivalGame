@@ -1,23 +1,17 @@
+"""The import statement uses the built in __import__() function
+to search available paths for a file with name mentioned and import functions,
+variables and classes from the .py file to the main code."""
 from LifeForm import *
+
+"""'from' imports mentioned functions from the file name preceded by it. '*' will import everything in the file"""
+
 from Game_items import *
 
-player=Player(500)
-'''
-#print(wild.__str__())
-Life=Life(100)
-#print(Life)
-eat=function('Eat',2,5)
-roast=function('Roast and Eat',2,10)
-food=moves(eat,roast)
-#print(food)
-Item=item('Pork',2,'Consumable that will replenish Energy',food)
-Drop=drop(Item)
-pig=Animal(100,'Pig','An animal with the chance to drop consumables',Drop)
-player=Player(500,wild)
-print(player)
-#print(player)
-'''
+player=Player(500) # Initialize the Player Object as 'player'
+
 def main_menu():
+    """Prints the Main page and prompts for input...if user presses Enter it proceeds. If any other key is pressed...
+    The program raises a SystemExit and terminates"""
     print('''
     
         :'######::'##::::'##:'########::'##::::'##:'####:'##::::'##::::'###::::'##::::::::'######::::::'###::::'##::::'##:'########:
@@ -48,7 +42,7 @@ def main_menu():
                                'Wait? Where are am I?...Ack! what's in my mouth -spits out sand-'
                                    You are so confused...That's when your memory rushed back!
                                You signed up for a cruise...A trip on a luxury ship going to a 
-                              luxurious island. Well on way, your friends dared to jump aboard... 
+                            luxurious island. Well on the way, your friends dared you to jump aboard... 
                                           swim a while and board the ship again.
                                     You are a pretty strong swimmer. So...why not?
                                 But what you didn't expect is the current to be so...strong.
@@ -69,12 +63,16 @@ def main_menu():
 It's bright out here...
 You better find water and food soon
 There are probably wild animals too...
-Yay -sarcasm-''')
+Yay -sarcasm-\n''')
             game_loop()
         else:
             raise SystemExit
 
 def game_loop():
+    """Game loops continuously checking if the player is dead,
+    If dead it proceeds to GAME OVER message
+    else continues to prompt the player for choice
+    After a scout, the game goes through the cycle function."""
     while not player.is_dead():
         try:
             player.actions = moves(player.premade_function('scout'),player.premade_function('inventory'))

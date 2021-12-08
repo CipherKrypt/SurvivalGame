@@ -1,4 +1,7 @@
 from Errors import *
+"""Class location to hold object environment in which the player will play and determine the possibility of the player encountering different things
+such as wolves, trees, animals etc...
+contains the name of the location and the chance of encountering different objects"""
 class Location:
     def __init__(self,place:str,thirst_mult:float,o2:int,merchant:int,people:int,trees:int,berries:int,water_source:int,hen:int,pig:int,gold:int,wolf:int):
         self.place=place
